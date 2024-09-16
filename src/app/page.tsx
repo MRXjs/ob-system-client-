@@ -3,20 +3,29 @@ import axios from 'axios'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { FaSpinner } from 'react-icons/fa'
-import { ToastContainer, toast } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+import { toast } from 'react-toastify'
 
 const Homepage = () => {
     const [isLoading, setIsLoading] = useState(false)
     const router = useRouter()
 
     useEffect(() => {
-        // check cookie is exits
-        const cookie = document.cookie.split('; ').find((row) => row.startsWith('accessToken='))
-        console.log(cookie)
-        if (cookie) {
-            router.push('/dashboard')
+        const checkUserLogin = async () => {
+            setIsLoading(true)
+            try {
+                const res = await axios.get(
+                    `${process.env.NEXT_PUBLIC_SERVER_HOST}/api/v1/is-login`,
+                    { withCredentials: true },
+                )
+                if (res.data.success) {
+                    router.push('/dashboard')
+                }
+            } catch (error: any) {
+                error?.response?.data.message && toast.error(error?.response?.data.message)
+            }
+            setIsLoading(false)
         }
+        checkUserLogin()
     }, [])
 
     const handleSubmit = async (e: any) => {
@@ -36,9 +45,7 @@ const Homepage = () => {
             )
             if (res.data.success) {
                 toast.success('Login successfully!', {})
-                // setTimeout(() => {
-                //     router.push('/dashboard')
-                // }, 2000)
+                router.push('/dashboard')
             }
         } catch (error: any) {
             error?.response?.data.message && toast.error(error?.response?.data.message)
@@ -89,7 +96,6 @@ const Homepage = () => {
                     </button>
                 </div>
             </form>
-            <ToastContainer />
         </div>
     )
 }

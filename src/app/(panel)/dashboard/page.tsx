@@ -15,10 +15,10 @@ const DashboardPage = (props: Props) => {
             <div className="w-full lg:w-2/3 flex flex-col gap-8">
                 {/* USER CARD */}
                 <div className="flex gap-4 justify-between flex-wrap">
-                    <UserCard type={'student'} />
-                    <UserCard type={'teacher'} />
-                    <UserCard type={'parent'} />
-                    <UserCard type={'staff'} />
+                    <UserCard type={'member'} />
+                    <UserCard type={'meeting'} />
+                    <UserCard type={'event'} />
+                    <UserCard type={'membership fee'} />
                 </div>
                 {/* MIDDLE CHART */}
                 <div className="flex gap-4 flex-col lg:flex-row">
