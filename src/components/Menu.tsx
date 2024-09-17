@@ -3,7 +3,7 @@ import { role } from '@/lib/data'
 import axios from 'axios'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { toast } from 'react-toastify'
 
 const menuItems = [
@@ -19,25 +19,25 @@ const menuItems = [
             {
                 icon: '/student.png',
                 label: 'Members',
-                href: '/list/members',
+                href: '/members',
                 visible: ['admin', 'teacher'],
             },
             {
                 icon: '/attendance.png',
                 label: 'Meetings',
-                href: '/list/meetings',
+                href: '/meetings',
                 visible: ['admin', 'teacher', 'student', 'parent'],
             },
             {
                 icon: '/calendar.png',
                 label: 'Events',
-                href: '/list/events',
+                href: '/events',
                 visible: ['admin', 'teacher', 'student', 'parent'],
             },
             {
                 icon: '/lesson.png',
                 label: 'Lessons',
-                href: '/list/lessons',
+                href: '/lessons',
                 visible: ['admin', 'teacher'],
             },
         ],
@@ -71,6 +71,7 @@ type Props = {}
 
 const Menu = (props: Props) => {
     const router = useRouter()
+    const pathname = usePathname()
 
     const logoutHandler = async () => {
         try {
@@ -106,7 +107,9 @@ const Menu = (props: Props) => {
                                 <Link
                                     key={item.label}
                                     href={item.href}
-                                    className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-mrxSky"
+                                    className={`flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-mrxSky ${
+                                        pathname === item.href && 'bg-mrxSkyLight'
+                                    }`}
                                 >
                                     <Image src={item.icon} alt="" width={20} height={20} />
                                     <span className="hidden lg:block">{item.label}</span>
