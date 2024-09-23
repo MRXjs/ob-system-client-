@@ -5,6 +5,7 @@ import Table from '@/components/Table'
 import TableSearch from '@/components/TableSearch'
 import { role } from '@/lib/data'
 import axios from 'axios'
+import moment from 'moment'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
@@ -20,7 +21,7 @@ type Member = {
     phoneNumber: number
     address: string
     job: string
-    job_position: string
+    workplace: string
     dob: string
     gender: string
     civilStatus: string
@@ -52,8 +53,8 @@ const columns = [
         className: 'hidden lg:table-cell',
     },
     {
-        header: 'Job',
-        accessor: 'job',
+        header: 'Action',
+        accessor: 'action',
     },
 ]
 
@@ -97,17 +98,19 @@ const MemberPage = (props: Props) => {
             </td>
             <td className="hidden md:table-cell">{item.memberId}</td>
             <td className="hidden md:table-cell">{item.gender}</td>
-            <td className="hidden md:table-cell">{item.dob}</td>
+            <td className="hidden md:table-cell">
+                {moment.utc(item.dob).local().format('YYYY-MM-DD')}
+            </td>
             <td className="hidden md:table-cell">{item.civilStatus}</td>
             <td>
                 <div className="flex items-center gap-2">
-                    <Link href={`/list/students/${item.memberId}`}>
+                    <Link href={`/members/${item.memberId}`}>
                         <button className="w-7 h-7 flex items-center justify-center rounded-full bg-mrxSky">
                             <Image src={'/view.png'} alt="" width={16} height={16} />
                         </button>
                     </Link>
                     {role === 'admin' && (
-                        <FormModal table="student" type="delete" id={item.memberId} />
+                        <FormModal table="member" type="delete" id={item.memberId} />
                     )}
                 </div>
             </td>
@@ -128,7 +131,7 @@ const MemberPage = (props: Props) => {
                         <button className="w-8 h-8 flex items-center justify-center rounded-full bg-mrxYellow">
                             <Image src={'/sort.png'} alt="" width={14} height={14} />
                         </button>
-                        {role === 'admin' && <FormModal table="student" type="create" />}
+                        {role === 'admin' && <FormModal table="member" type="create" />}
                     </div>
                 </div>
             </div>
