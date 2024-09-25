@@ -4,9 +4,11 @@ type Props = {
     columns: { header: string; accessor: string; className?: string }[]
     renderRow: (item: any) => React.ReactNode
     data: any[]
+    recordFerPage: number
+    page: number
 }
 
-const Table = ({ columns, renderRow, data }: Props) => {
+const Table = ({ columns, renderRow, data, recordFerPage, page }: Props) => {
     return (
         <table className="w-full mt-4">
             <thead>
@@ -18,7 +20,11 @@ const Table = ({ columns, renderRow, data }: Props) => {
                     ))}
                 </tr>
             </thead>
-            <tbody>{data.map((item) => renderRow(item))}</tbody>
+            <tbody>
+                {data
+                    ?.slice(page * recordFerPage - recordFerPage, page * recordFerPage)
+                    .map((item) => renderRow(item))}
+            </tbody>
         </table>
     )
 }

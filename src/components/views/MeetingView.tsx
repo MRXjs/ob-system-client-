@@ -58,13 +58,9 @@ const columns = [
     },
 ]
 
-const MemberPage = (props: Props) => {
+const MeetingView = (props: Props) => {
     const [isLoading, setIsLoading] = useState(false)
     const [memberData, setMemberData] = useState<Member[]>([])
-
-    // pagination
-    const [page, setPage] = useState(1)
-    const recordFerPage = 8
 
     useEffect(() => {
         ;(async () => {
@@ -140,22 +136,11 @@ const MemberPage = (props: Props) => {
                 </div>
             </div>
             {/* LIST */}
-            <Table
-                columns={columns}
-                renderRow={renderRow}
-                data={memberData}
-                recordFerPage={recordFerPage}
-                page={page}
-            />
+            <Table columns={columns} renderRow={renderRow} data={memberData} />
             {/* PAGINATION */}
-            <Pagination
-                rowCount={memberData.length}
-                recordFerPage={recordFerPage}
-                page={page}
-                setPage={setPage}
-            />
+            <Pagination />
         </div>
     )
 }
 
-export default MemberPage
+export default MeetingView

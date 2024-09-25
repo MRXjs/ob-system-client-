@@ -4,6 +4,7 @@ import axios from 'axios'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import { FaSpinner } from 'react-icons/fa'
+import { toast } from 'react-toastify'
 
 type Props = {}
 
@@ -36,6 +37,7 @@ const Navbar = (props: Props) => {
                 <input
                     type="text"
                     placeholder="Search..."
+                    onClick={showNDMessage}
                     className="w-[200px] p-2 bg-transparent outline-none"
                 />
             </div>

@@ -1,5 +1,6 @@
 'use client'
 import { role } from '@/lib/data'
+import { showNDMessage } from '@/lib/fuctions'
 import axios from 'axios'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -94,16 +95,33 @@ const Menu = (props: Props) => {
                     <span className="hidden lg:block text-gray-400 font-light my-4">{i.title}</span>
                     {i.items.map((item: any) => {
                         if (item.visible.includes(role)) {
-                            return item.label === 'Logout' ? (
-                                <div
-                                    key={item.label}
-                                    onClick={logoutHandler}
-                                    className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-mrxSky cursor-pointer"
-                                >
-                                    <Image src={item.icon} alt="" width={20} height={20} />
-                                    <span className="hidden lg:block">{item.label}</span>
-                                </div>
-                            ) : (
+                            if (item.label === 'Logout') {
+                                return (
+                                    <div
+                                        key={item.label}
+                                        onClick={logoutHandler}
+                                        className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-mrxSky cursor-pointer"
+                                    >
+                                        <Image src={item.icon} alt="" width={20} height={20} />
+                                        <span className="hidden lg:block">{item.label}</span>
+                                    </div>
+                                )
+                            }
+
+                            if (item.label === 'Profile' || item.label === 'Settings') {
+                                return (
+                                    <div
+                                        key={item.label}
+                                        onClick={showNDMessage}
+                                        className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-mrxSky cursor-pointer"
+                                    >
+                                        <Image src={item.icon} alt="" width={20} height={20} />
+                                        <span className="hidden lg:block">{item.label}</span>
+                                    </div>
+                                )
+                            }
+
+                            return (
                                 <Link
                                     key={item.label}
                                     href={item.href}
