@@ -6,6 +6,8 @@ import React, { useEffect, useState } from 'react'
 import { FaSpinner } from 'react-icons/fa'
 import { toast } from 'react-toastify'
 import FeeForm from './forms/FeeForm'
+import MeetingView from './views/MeetingView'
+import EventView from './views/EventView'
 
 const MemberForm = dynamic(() => import('./forms/MemberForm'), {
     loading: () => <h1>Loading....</h1>,
@@ -114,7 +116,8 @@ const FormModal = ({ table, type, data, id }: Props) => {
         }
 
         if (type === 'view') {
-            return <> test</>
+            if (table === 'meeting') return <MeetingView meetingId={id} data={data} />
+            if (table === 'event') return <EventView eventId={id} data={data} />
         }
 
         if (type === 'create' || type === 'update') {

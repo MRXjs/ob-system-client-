@@ -23,7 +23,7 @@ const Table = ({ columns, renderRow, data, recordFerPage, page }: Props) => {
             <tbody>
                 {data
                     ?.slice(page * recordFerPage - recordFerPage, page * recordFerPage)
-                    .map((item) => renderRow(item))}
+                    .map((item, index) => renderRow(item))}
             </tbody>
         </table>
     )

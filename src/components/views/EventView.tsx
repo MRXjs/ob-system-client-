@@ -10,13 +10,13 @@ import { FaSpinner } from 'react-icons/fa'
 import { toast } from 'react-toastify'
 
 type Props = {
-    meetingId: number | undefined
+    eventId: number | undefined
     data: any
 }
 
-type Member = {
+type Event = {
     member_id: number
-    meeting_id: number
+    event_id: number
     status: boolean
     full_name: string
 }
@@ -41,9 +41,9 @@ const columns = [
     },
 ]
 
-const MeetingView = ({ meetingId, data }: Props) => {
+const EventView = ({ eventId, data }: Props) => {
     const [isLoading, setIsLoading] = useState(false)
-    const [memberData, setMemberData] = useState<Member[]>([])
+    const [eventData, setEventData] = useState<Event[]>([])
 
     // pagination
     const [page, setPage] = useState(1)
@@ -54,11 +54,11 @@ const MeetingView = ({ meetingId, data }: Props) => {
             setIsLoading(true)
             try {
                 const res = await axios.get(
-                    `${process.env.NEXT_PUBLIC_SERVER_HOST}/api/v1/meeting-involves/${meetingId}`,
+                    `${process.env.NEXT_PUBLIC_SERVER_HOST}/api/v1/event_contributes/${eventId}`,
                     { withCredentials: true },
                 )
                 if (res.data.success) {
-                    setMemberData(res.data.meetingInvolves)
+                    setEventData(res.data.eventContributes)
                 }
             } catch (error) {
                 console.log(error)
@@ -68,33 +68,28 @@ const MeetingView = ({ meetingId, data }: Props) => {
         })()
     }, [])
 
-    const attendanceHandler = async (event: any, item: any) => {
+    const contributeHandler = async (e: any, item: any) => {
         const data = {
             member_id: item.member_id,
-            meeting_id: item.meeting_id,
-            status: event.target.checked,
+            event_id: item.event_id,
+            status: e.target.checked,
         }
-
-        console.log(event.target.checked)
 
         setIsLoading(true)
         try {
             const res = await axios.put(
-                `${process.env.NEXT_PUBLIC_SERVER_HOST}/api/v1/meeting-attendance-mark`,
+                `${process.env.NEXT_PUBLIC_SERVER_HOST}/api/v1/event-contribute-mark`,
                 data,
                 { withCredentials: true },
             )
             if (res.data.success) {
-                const updatedMemberData = memberData.map((member: any) => {
-                    if (
-                        member.member_id === item.member_id &&
-                        member.meeting_id === item.meeting_id
-                    ) {
-                        member.status = event.target.checked ? 0 : 1
+                const updatedEventData = eventData.map((event: any) => {
+                    if (event.member_id === item.member_id && event.event_id === item.event_id) {
+                        event.status = e.target.checked ? 0 : 1
                     }
-                    return member
+                    return event
                 })
-                setMemberData(updatedMemberData)
+                setEventData(updatedEventData)
 
                 toast.success(res.data.message)
             }
@@ -105,9 +100,7 @@ const MeetingView = ({ meetingId, data }: Props) => {
         setIsLoading(false)
     }
 
-    console.log(memberData)
-
-    const renderRow = (item: Member) => (
+    const renderRow = (item: Event) => (
         <tr
             key={item.member_id}
             className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-mrxPurpleLight"
@@ -131,20 +124,14 @@ const MeetingView = ({ meetingId, data }: Props) => {
                     item.status ? 'text-green-500' : 'text-red-500'
                 }`}
             >
-                {isLoading ? (
-                    <FaSpinner className="animate-spin h-6 w-6 mr-3 " />
-                ) : item.status ? (
-                    'Present'
-                ) : (
-                    'Absent'
-                )}
+                {item.status ? 'Contribute' : 'Not Contribute'}
             </td>
             <td className="flex items-center justify-between">
                 <div>
                     <input
                         type="checkbox"
                         onChange={(event) => {
-                            attendanceHandler(event, item)
+                            contributeHandler(event, item)
                         }}
                         checked={item.status}
                         className=" w-5 h-5 cursor-pointer"
@@ -175,13 +162,13 @@ const MeetingView = ({ meetingId, data }: Props) => {
             <Table
                 columns={columns}
                 renderRow={renderRow}
-                data={memberData}
+                data={eventData}
                 recordFerPage={recordFerPage}
                 page={page}
             />
             {/* PAGINATION */}
             <Pagination
-                rowCount={memberData.length}
+                rowCount={eventData.length}
                 recordFerPage={recordFerPage}
                 page={page}
                 setPage={setPage}
@@ -190,4 +177,4 @@ const MeetingView = ({ meetingId, data }: Props) => {
     )
 }
 
-export default MeetingView
+export default EventView

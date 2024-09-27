@@ -75,7 +75,12 @@ const EventPage = (props: Props) => {
             <td className="hidden md:table-cell">{item.description}</td>
             <td>
                 <div className="flex items-center gap-2">
-                    <FormModal table="event" type="view" id={item.event_id} />
+                    <FormModal
+                        table="event"
+                        type="view"
+                        id={item.event_id}
+                        data={{ date: item.date, description: item.description }}
+                    />
                     <FormModal table="event" type="update" data={item} />
                     {role === 'admin' && (
                         <FormModal table="event" type="delete" id={item.event_id} />

@@ -11,7 +11,7 @@ import React, { useEffect, useState } from 'react'
 
 type Props = {}
 
-type Member = {
+type Meeting = {
     meeting_id: number
     date: string
     description: string
@@ -33,11 +33,15 @@ const columns = [
         accessor: 'description',
         className: 'hidden lg:table-cell',
     },
+    {
+        header: 'Action',
+        accessor: 'action',
+    },
 ]
 
 const MeetingPage = (props: Props) => {
     const [isLoading, setIsLoading] = useState(false)
-    const [meetingData, setMeetingData] = useState<Member[]>([])
+    const [meetingData, setMeetingData] = useState<Meeting[]>([])
 
     // pagination
     const [page, setPage] = useState(1)
@@ -59,7 +63,7 @@ const MeetingPage = (props: Props) => {
         })()
     }, [])
 
-    const renderRow = (item: Member) => (
+    const renderRow = (item: Meeting) => (
         <tr
             key={item.meeting_id}
             className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-mrxPurpleLight"
@@ -69,7 +73,12 @@ const MeetingPage = (props: Props) => {
             <td className="hidden md:table-cell">{item.description}</td>
             <td>
                 <div className="flex items-center gap-2">
-                    <FormModal table="meeting" type="view" id={item.meeting_id} />
+                    <FormModal
+                        table="meeting"
+                        type="view"
+                        id={item.meeting_id}
+                        data={{ date: item.date, description: item.description }}
+                    />
                     <FormModal table="meeting" type="update" data={item} />
                     {role === 'admin' && (
                         <FormModal table="meeting" type="delete" id={item.meeting_id} />
