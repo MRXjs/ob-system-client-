@@ -6,17 +6,16 @@ import moment from 'moment'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
-
 import { toast } from 'react-toastify'
 
 type Props = {
-    eventId: number | undefined
+    feeId: number | undefined
     data: any
 }
 
 type Event = {
     member_id: number
-    event_id: number
+    fee_id: number
     status: boolean
     full_name: string
 }
@@ -31,7 +30,7 @@ const columns = [
         className: 'hidden md:table-cell',
     },
     {
-        header: 'Attendance',
+        header: 'Paid Status',
         accessor: 'status',
         className: 'hidden lg:table-cell',
     },
@@ -41,9 +40,9 @@ const columns = [
     },
 ]
 
-const EventView = ({ eventId, data }: Props) => {
+const FeeView = ({ feeId, data }: Props) => {
     const [isLoading, setIsLoading] = useState(false)
-    const [eventData, setEventData] = useState<Event[]>([])
+    const [feeMemberData, setFeeMemberData] = useState<Event[]>([])
 
     // pagination
     const [page, setPage] = useState(1)
@@ -54,11 +53,11 @@ const EventView = ({ eventId, data }: Props) => {
             setIsLoading(true)
             try {
                 const res = await axios.get(
-                    `${process.env.NEXT_PUBLIC_SERVER_HOST}/api/v1/event_contributes/${eventId}`,
+                    `${process.env.NEXT_PUBLIC_SERVER_HOST}/api/v1/fee-member/${feeId}`,
                     { withCredentials: true },
                 )
                 if (res.data.success) {
-                    setEventData(res.data.eventContributes)
+                    setFeeMemberData(res.data.feeMember)
                 }
             } catch (error) {
                 console.log(error)
@@ -68,28 +67,28 @@ const EventView = ({ eventId, data }: Props) => {
         })()
     }, [])
 
-    const contributeHandler = async (e: any, item: any) => {
+    const paidHandler = async (e: any, item: any) => {
         const data = {
             member_id: item.member_id,
-            event_id: item.event_id,
+            fee_id: item.fee_id,
             status: e.target.checked,
         }
 
         setIsLoading(true)
         try {
             const res = await axios.put(
-                `${process.env.NEXT_PUBLIC_SERVER_HOST}/api/v1/event-contribute-mark`,
+                `${process.env.NEXT_PUBLIC_SERVER_HOST}/api/v1/paid-member-mark`,
                 data,
                 { withCredentials: true },
             )
             if (res.data.success) {
-                const updatedEventData = eventData.map((event: any) => {
-                    if (event.member_id === item.member_id && event.event_id === item.event_id) {
-                        event.status = e.target.checked ? 0 : 1
+                const updatedFeeMemberData = feeMemberData.map((fee: any) => {
+                    if (fee.member_id === item.member_id && fee.fee_id === item.fee_id) {
+                        fee.status = e.target.checked ? 0 : 1
                     }
-                    return event
+                    return fee
                 })
-                setEventData(updatedEventData)
+                setFeeMemberData(updatedFeeMemberData)
 
                 toast.success(res.data.message)
             }
@@ -124,14 +123,14 @@ const EventView = ({ eventId, data }: Props) => {
                     item.status ? 'text-green-500' : 'text-red-500'
                 }`}
             >
-                {item.status ? 'Contribute' : 'Not Contribute'}
+                {item.status ? 'Paid' : 'Not Paid'}
             </td>
             <td className="flex items-center justify-between">
                 <div>
                     <input
                         type="checkbox"
-                        onChange={(event) => {
-                            contributeHandler(event, item)
+                        onChange={(e) => {
+                            paidHandler(e, item)
                         }}
                         checked={item.status}
                         className=" w-5 h-5 cursor-pointer"
@@ -152,7 +151,7 @@ const EventView = ({ eventId, data }: Props) => {
         <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
             {/* TOP */}
             <div className="flex items-center justify-between flex-col">
-                <h1 className="hidden md:block text-lg font-semibold">{`Meeting  ${moment
+                <h1 className="hidden md:block text-lg font-semibold">{`Membership Fee  ${moment
                     .utc(data?.date)
                     .local()
                     .format('YYYY-MM-DD')} `}</h1>
@@ -162,13 +161,13 @@ const EventView = ({ eventId, data }: Props) => {
             <Table
                 columns={columns}
                 renderRow={renderRow}
-                data={eventData}
+                data={feeMemberData}
                 recordFerPage={recordFerPage}
                 page={page}
             />
             {/* PAGINATION */}
             <Pagination
-                rowCount={eventData.length}
+                rowCount={feeMemberData.length}
                 recordFerPage={recordFerPage}
                 page={page}
                 setPage={setPage}
@@ -177,4 +176,4 @@ const EventView = ({ eventId, data }: Props) => {
     )
 }
 
-export default EventView
+export default FeeView

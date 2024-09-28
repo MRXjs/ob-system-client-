@@ -8,6 +8,7 @@ import { toast } from 'react-toastify'
 import FeeForm from './forms/FeeForm'
 import MeetingView from './views/MeetingView'
 import EventView from './views/EventView'
+import FeeView from './views/FeeView'
 
 const MemberForm = dynamic(() => import('./forms/MemberForm'), {
     loading: () => <h1>Loading....</h1>,
@@ -118,6 +119,7 @@ const FormModal = ({ table, type, data, id }: Props) => {
         if (type === 'view') {
             if (table === 'meeting') return <MeetingView meetingId={id} data={data} />
             if (table === 'event') return <EventView eventId={id} data={data} />
+            if (table === 'fee') return <FeeView feeId={id} data={data} />
         }
 
         if (type === 'create' || type === 'update') {

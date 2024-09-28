@@ -77,7 +77,12 @@ const FeesPage = (props: Props) => {
             <td className="hidden md:table-cell">{item.description}</td>
             <td>
                 <div className="flex items-center gap-2">
-                    <FormModal table="fee" type="view" id={item.fee_id} />
+                    <FormModal
+                        table="fee"
+                        type="view"
+                        id={item.fee_id}
+                        data={{ date: item.date, description: item.description }}
+                    />
                     <FormModal table="fee" type="update" data={item} />
                     {role === 'admin' && <FormModal table="fee" type="delete" id={item.fee_id} />}
                 </div>
