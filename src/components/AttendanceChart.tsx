@@ -1,8 +1,9 @@
 'use client'
-
-type Props = {}
-
+import axios from 'axios'
+import moment from 'moment'
 import Image from 'next/image'
+import { useEffect, useState } from 'react'
+import { toast } from 'react-toastify'
 import {
     BarChart,
     Bar,
@@ -15,35 +16,64 @@ import {
     ResponsiveContainer,
 } from 'recharts'
 
-const data = [
-    {
-        name: 'Mon',
-        present: 60,
-        absent: 40,
-    },
-    {
-        name: 'Tue',
-        present: 71,
-        absent: 60,
-    },
-    {
-        name: 'Wed',
-        present: 92,
-        absent: 75,
-    },
-    {
-        name: 'Thu',
-        present: 90,
-        absent: 75,
-    },
-    {
-        name: 'Fri',
-        present: 65,
-        absent: 55,
-    },
-]
+type Props = {}
+
+// const data = [
+//     {
+//         date: '2024-01-21',
+//         present: 60,
+//         absent: 40,
+//     },
+//     {
+//         date: '2024-02-21',
+//         present: 71,
+//         absent: 60,
+//     },
+//     {
+//         date: '2024-03-21',
+//         present: 92,
+//         absent: 75,
+//     },
+//     {
+//         date: '2024-04-21',
+//         present: 90,
+//         absent: 75,
+//     },
+//     {
+//         date: '2024-05-21',
+//         present: 65,
+//         absent: 55,
+//     },
+// ]
 
 const AttendanceChart = (props: Props) => {
+    const [isLoading, setIsLoading] = useState(false)
+    const [data, setData] = useState([])
+
+    useEffect(() => {
+        ;(async () => {
+            setIsLoading(true)
+            try {
+                const res = await axios.get(
+                    `${process.env.NEXT_PUBLIC_SERVER_HOST}/api/v1/meeting-attendance-percentage`,
+
+                    { withCredentials: true },
+                )
+                if (res.data.success) {
+                    const attendanceData = res.data.attendanceData
+                    const dateConvert = attendanceData.map((meeting: any, index: number) => {
+                        meeting.date = moment.utc(meeting.date).local().format('YYYY-MM-DD')
+                        return meeting
+                    })
+                    setData(dateConvert)
+                }
+            } catch (error: any) {
+                error?.response?.data.message && toast.error(error?.response?.data.message)
+            }
+            setIsLoading(false)
+        })()
+    }, [])
+
     return (
         <div className="bg-white rounded-lg p-4 h-full">
             <div className="flex justify-between items-center">
@@ -54,7 +84,7 @@ const AttendanceChart = (props: Props) => {
                 <BarChart width={500} height={300} data={data} barSize={20}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ddd" />
                     <XAxis
-                        dataKey="name"
+                        dataKey="date"
                         axisLine={false}
                         tick={{ fill: '#d1d5db' }}
                         tickLine={false}

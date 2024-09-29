@@ -27,7 +27,6 @@ const columns = [
         accessor: 'date',
         className: '',
     },
-
     {
         header: 'Description',
         accessor: 'description',

@@ -18,8 +18,14 @@ const SingleMemberPage = ({ params }: Props) => {
     const id = params.id
     const [isLoading, setIsLoading] = useState(false)
     const [member, setMember] = useState({}) as any
+    const [attendancePercentage, setAttendancePercentage] = useState(0)
+    const [contributePercentage, setContributePercentage] = useState(0)
+    const [paidPercentage, setPaidPercentage] = useState(0)
 
     useEffect(() => {
+        setIsLoading(true)
+
+        // get member data
         ;(async () => {
             try {
                 const res = await axios.get(
@@ -33,6 +39,53 @@ const SingleMemberPage = ({ params }: Props) => {
                 console.log(error)
             }
         })()
+
+        // meeting attendance percentage
+        ;(async () => {
+            try {
+                const res = await axios.get(
+                    `${process.env.NEXT_PUBLIC_SERVER_HOST}/api/v1/member-meeting-attendance-percentage/${id}`,
+                    { withCredentials: true },
+                )
+                if (res.data.success) {
+                    setAttendancePercentage(res.data.attendancePercentageData.attendancePercentage)
+                }
+            } catch (error) {
+                console.log(error)
+            }
+        })()
+
+        // event contribute percentage
+        ;(async () => {
+            try {
+                const res = await axios.get(
+                    `${process.env.NEXT_PUBLIC_SERVER_HOST}/api/v1/member-event-contribute-percentage/${id}`,
+                    { withCredentials: true },
+                )
+                if (res.data.success) {
+                    setContributePercentage(res.data.contributePercentageData.contributePercentage)
+                }
+            } catch (error) {
+                console.log(error)
+            }
+        })()
+
+        // event contribute percentage
+        ;(async () => {
+            try {
+                const res = await axios.get(
+                    `${process.env.NEXT_PUBLIC_SERVER_HOST}/api/v1/member-membership-paid-percentage/${id}`,
+                    { withCredentials: true },
+                )
+                if (res.data.success) {
+                    setPaidPercentage(res.data.paidPercentageData.paidPercentage)
+                }
+            } catch (error) {
+                console.log(error)
+            }
+        })()
+
+        setIsLoading(false)
     }, [id])
 
     return (
@@ -61,9 +114,6 @@ const SingleMemberPage = ({ params }: Props) => {
                                     <FormModal table="member" type="update" data={member} />
                                 )}
                             </div>
-                            <p className="text-sm text-gray-500">
-                                Lorem ipsum, dolor sit amet consectetur adipisicing
-                            </p>
                             <div className=" flex items-center justify-between gap-2 flex-wrap text-xs font-medium">
                                 <div className="w-full md:w-1/3 lg:w-full 2xl:w-1/3 flex items-center gap-2">
                                     <Image src={'/blood.png'} alt="" width={14} height={14} />
@@ -98,7 +148,7 @@ const SingleMemberPage = ({ params }: Props) => {
                                 className="w-6 h-6"
                             />
                             <div className="">
-                                <h1 className="text-xl font-semibold">90%</h1>
+                                <h1 className="text-xl font-semibold">{`${attendancePercentage}%`}</h1>
                                 <span className="text-sm text-gray-400">Attendance</span>
                             </div>
                         </div>
@@ -112,7 +162,7 @@ const SingleMemberPage = ({ params }: Props) => {
                                 className="w-6 h-6"
                             />
                             <div className="">
-                                <h1 className="text-xl font-semibold">6th</h1>
+                                <h1 className="text-xl font-semibold">{`${contributePercentage}%`}</h1>
                                 <span className="text-sm text-gray-400">Event</span>
                             </div>
                         </div>
@@ -126,22 +176,8 @@ const SingleMemberPage = ({ params }: Props) => {
                                 className="w-6 h-6"
                             />
                             <div className="">
-                                <h1 className="text-xl font-semibold">18</h1>
+                                <h1 className="text-xl font-semibold">{`${paidPercentage}%`}</h1>
                                 <span className="text-sm text-gray-400">Fees</span>
-                            </div>
-                        </div>
-                        {/* CARD */}
-                        <div className=" bg-white p-4 rounded-md flex gap-4 w-full md:w-[48%] xl:w-[45%] 2xl:w-[48%] ">
-                            <Image
-                                src={'/singleClass.png'}
-                                alt=""
-                                width={24}
-                                height={24}
-                                className="w-6 h-6"
-                            />
-                            <div className="">
-                                <h1 className="text-xl font-semibold">6A</h1>
-                                <span className="text-sm text-gray-400">Class</span>
                             </div>
                         </div>
                     </div>

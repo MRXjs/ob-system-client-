@@ -4,7 +4,6 @@ import moment from 'moment'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import { FaSpinner } from 'react-icons/fa'
-import { number } from 'zod'
 
 type Props = {
     type: String

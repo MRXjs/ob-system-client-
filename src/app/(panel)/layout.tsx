@@ -18,7 +18,6 @@ export default function DashboardLayout({
                 >
                     <Image src={'/logo.png'} alt="logo" width={32} height={32} />
                     <span className="hidden lg:block font-bold">OB System</span>
-                    {/* <span className="hidden lg:block font-bold">Fine Clean</span> */}
                 </Link>
                 <Menu />
             </div>
