@@ -257,7 +257,11 @@ const SingleMemberPage = ({ params }: Props) => {
                         </Link> */}
                     </div>
                 </div>
-                <Performance />
+                <Performance
+                    attendancePercentage={attendancePercentage}
+                    contributePercentage={contributePercentage}
+                    paidPercentage={paidPercentage}
+                />
             </div>
         </div>
     )

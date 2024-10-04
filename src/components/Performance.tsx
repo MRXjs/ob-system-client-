@@ -1,15 +1,27 @@
 'use client'
+import moment from 'moment'
 import Image from 'next/image'
+import { useEffect } from 'react'
 import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from 'recharts'
 
-type Props = {}
+type Props = {
+    attendancePercentage: number
+    contributePercentage: number
+    paidPercentage: number
+}
 
 const data = [
     { name: 'Group A', value: 92, fill: '#C3EBFA' },
     { name: 'Group B', value: 8, fill: '#FAE27C' },
 ]
 
-const Performance = (props: Props) => {
+const Performance = ({ attendancePercentage, contributePercentage, paidPercentage }: Props) => {
+    useEffect(() => {
+        console.log(attendancePercentage, contributePercentage, paidPercentage)
+
+        // const paidPercentage = 300 > 0 ? Math.round((paidFees / totalFees) * 100) : 0
+    }, [attendancePercentage, contributePercentage, paidPercentage])
+
     return (
         <div className="bg-white p-4 rounded-md h-80 relative">
             <div className="flex items-center justify-between">
@@ -35,7 +47,7 @@ const Performance = (props: Props) => {
                 <p className="text-xs text-gray-300">of 10 max LTS</p>
             </div>
             <h2 className="font-medium absolute bottom-16 left-0 right-0 m-auto text-center">
-                1st Semester - 2nd Semester
+                {moment().format('dddd, MMMM Do YYYY')}
             </h2>
         </div>
     )

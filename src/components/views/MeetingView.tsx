@@ -75,8 +75,6 @@ const MeetingView = ({ meetingId, data }: Props) => {
             status: event.target.checked,
         }
 
-        console.log(event.target.checked)
-
         setIsLoading(true)
         try {
             const res = await axios.put(
@@ -104,8 +102,6 @@ const MeetingView = ({ meetingId, data }: Props) => {
         }
         setIsLoading(false)
     }
-
-    console.log(memberData)
 
     const renderRow = (item: Member) => (
         <tr

@@ -2,6 +2,8 @@
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import AbsentMeetings from './shortcuts/AbsentMeetings'
+import NotContributeEvents from './shortcuts/NotContributeEvents'
+import UnpaidFees from './shortcuts/UnpaidFees'
 
 type Props = {
     type: 'Absence meeting' | 'Not Contribute event' | 'Unpaid fees'
@@ -51,15 +53,15 @@ const ShortCutModel = ({ type, id }: Props) => {
 
     const renderModalContent = () => {
         if (type === 'Absence meeting') {
-            return <AbsentMeetings />
+            return <AbsentMeetings memberId={id} />
         }
 
         if (type === 'Not Contribute event') {
-            return <div>Sample test</div>
+            return <NotContributeEvents memberId={id} />
         }
 
         if (type === 'Unpaid fees') {
-            return <div>Sample test</div>
+            return <UnpaidFees memberId={id} />
         }
         return null
     }

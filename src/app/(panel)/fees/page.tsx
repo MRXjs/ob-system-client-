@@ -17,6 +17,7 @@ type Fee = {
     fee: string
     description: string
 }
+
 const columns = [
     {
         header: 'Fee ID',
