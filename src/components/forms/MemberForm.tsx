@@ -7,6 +7,10 @@ import Image from 'next/image'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import moment from 'moment'
+import Cropper, { Area, Point } from 'react-easy-crop'
+import { useEffect, useState } from 'react'
+import { FaFileUpload } from 'react-icons/fa'
+import getCroppedImg from '@/lib/getCroppedImg'
 
 type Props = {
     type: 'create' | 'update'
@@ -30,13 +34,19 @@ const schema = z.object({
     whatsapp_number: z.string().min(10, { message: 'Whatsapp Number is required!' }),
     workplace: z.string().optional(),
     job: z.string().optional(),
-    year_of_joing_school: z.string().min(4, { message: 'Enter the year!' }),
+    year_of_joining_school: z.string().min(4, { message: 'Enter the year!' }),
     year_of_out_school: z.string().min(4, { message: 'Enter the year!' }),
+    registration_fee_paid: z.string(),
 })
 
 type Inputs = z.infer<typeof schema>
 
 const MemberForm = ({ type, data }: Props) => {
+    const [crop, setCrop] = useState<Point>({ x: 0, y: 0 })
+    const [zoom, setZoom] = useState(1)
+    const [avatar, setAvatar] = useState<any>(null)
+    const [croppedImage, setCroppedImage] = useState<any>(null)
+
     const {
         register,
         handleSubmit,
@@ -45,13 +55,62 @@ const MemberForm = ({ type, data }: Props) => {
         resolver: zodResolver(schema),
     })
 
-    const onSubmit = handleSubmit(async (formData) => {
-        if (type === 'create') {
+    useEffect(() => {
+        if (data?.avatar) {
+            setAvatar(`${process.env.NEXT_PUBLIC_SERVER_HOST}/api/v1/avatar/${data.avatar}`)
+            console.log(data.avatar)
+        }
+    }, [data])
+
+    const handleFileChange = (e: any) => {
+        const file = URL.createObjectURL(e.target.files[0]) as any
+        setAvatar(file)
+    }
+
+    const onCropComplete = async (croppedArea: Area, croppedAreaPixels: Area) => {
+        try {
+            const croppedBlob = await getCroppedImg(avatar, croppedAreaPixels) // Utility to crop image
+            setCroppedImage(croppedBlob)
+        } catch (error) {
+            console.error('Failed to crop image', error)
+        }
+    }
+
+    console.log(croppedImage)
+
+    const onSubmit = handleSubmit(async (formData: any) => {
+        // because registration_fee_paid datatype is TINYINT
+        formData.registration_fee_paid = Number(formData.registration_fee_paid)
+
+        if (croppedImage) {
             try {
+                const form = new FormData()
+                form.append('avatar', croppedImage, 'avatar.png')
+                const res = await axios.post(
+                    `${process.env.NEXT_PUBLIC_SERVER_HOST}/api/v1/avatar-upload`,
+                    form,
+                    {
+                        withCredentials: true,
+                    },
+                )
+                if (res.data.success) {
+                    formData.avatar = res.data.fileName
+                }
+            } catch (error: any) {
+                if (error?.response?.data.message) {
+                    return toast.error(error?.response?.data.message)
+                }
+            }
+        }
+
+        try {
+            if (type === 'create') {
                 const res = await axios.post(
                     `${process.env.NEXT_PUBLIC_SERVER_HOST}/api/v1/add-member`,
                     formData,
-                    { withCredentials: true },
+                    {
+                        withCredentials: true,
+                    },
                 )
                 if (res.data.success) {
                     toast.success(res.data.message)
@@ -59,33 +118,77 @@ const MemberForm = ({ type, data }: Props) => {
                         window.location.reload()
                     }, 1000)
                 }
-            } catch (error: any) {
-                console.log(error)
-                error?.response?.data.message && toast.error(error?.response?.data.message)
-            }
-        } else if (type === 'update') {
-            try {
+            } else if (type === 'update') {
                 const res = await axios.put(
                     `${process.env.NEXT_PUBLIC_SERVER_HOST}/api/v1/update-member/${data.memberId}`,
                     formData,
-                    { withCredentials: true },
+                    {
+                        withCredentials: true,
+                    },
                 )
                 if (res.data.success) {
                     toast.success(res.data.message)
-                    setTimeout(() => {
-                        window.location.reload()
-                    }, 1000)
+                    // setTimeout(() => {
+                    //     window.location.reload()
+                    // }, 1000)
                 }
-            } catch (error: any) {
-                console.log(error)
-                error?.response?.data.message && toast.error(error?.response?.data.message)
             }
+        } catch (error: any) {
+            if (type === 'create') {
+                try {
+                    const res = await axios.delete(
+                        `${process.env.NEXT_PUBLIC_SERVER_HOST}/api/v1/avatar-delete/${formData.avatar}`,
+                        {
+                            withCredentials: true,
+                        },
+                    )
+                } catch (error) {
+                    console.log(error)
+                }
+            }
+            console.log(error)
+            error?.response?.data.message && toast.error(error?.response?.data.message)
         }
     })
 
     return (
-        <form className="flex flex-col gap-8" onSubmit={onSubmit}>
-            <h1 className="text-xl font-semibold">Create a new member</h1>
+        <form className="flex flex-col gap-8 overflow-auto h-[95vh] p-5" onSubmit={onSubmit}>
+            <h1 className="text-xl font-semibold text-center">
+                {type === 'create' ? 'Create a new member' : 'Update a member'}
+            </h1>
+            <div className="flex items-center justify-center flex-col ">
+                <div className="mb-2">
+                    <Cropper
+                        image={avatar}
+                        crop={crop}
+                        zoom={zoom}
+                        aspect={1}
+                        onCropChange={setCrop}
+                        onCropComplete={onCropComplete}
+                        onZoomChange={setZoom}
+                        cropShape={'round'}
+                        classes={{
+                            containerClassName:
+                                ' !relative w-80 h-80 bg-gray-200 rounded-2xl overflow-hidden',
+                            mediaClassName: '',
+                        }}
+                    />
+                </div>
+                <input
+                    type="file"
+                    id="file-upload"
+                    className="hidden"
+                    accept=".jpg,.jpeg,.png"
+                    onChange={handleFileChange}
+                />
+                <label
+                    htmlFor="file-upload"
+                    className="cursor-pointer flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600"
+                >
+                    <FaFileUpload className="mr-2" />
+                    Choose Image
+                </label>
+            </div>
             <span className="text-sm text-gray-400 font-medium">Personal Information</span>
             <div className="flex justify-between flex-wrap gap-4">
                 <InputField
@@ -199,10 +302,10 @@ const MemberForm = ({ type, data }: Props) => {
             <div className="flex justify-between flex-wrap gap-4 ">
                 <InputField
                     label="Year of Joining School"
-                    name="year_of_joing_school"
-                    defaultValue={data?.yearOfJoingSchool}
+                    name="year_of_joining_school"
+                    defaultValue={data?.yearOfJoiningSchool}
                     register={register}
-                    error={errors.year_of_joing_school}
+                    error={errors.year_of_joining_school}
                 />
                 <InputField
                     label="Year Of Out School"
@@ -211,8 +314,28 @@ const MemberForm = ({ type, data }: Props) => {
                     register={register}
                     error={errors.year_of_out_school}
                 />
+                <div className="flex flex-col gap-2 w-full md:w-1/4"></div>
             </div>
-
+            {/* Payment Information */}
+            <span className="text-sm text-gray-400 font-medium">Payment Information</span>
+            <div className="flex justify-between flex-wrap gap-4 ">
+                <div className="flex flex-col gap-2 w-full md:w-1/4">
+                    <label className="text-xs text-gray-500">Registration Fee Paid </label>
+                    <select
+                        {...register('registration_fee_paid')}
+                        defaultValue={data?.registrationFeePaid}
+                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+                    >
+                        <option value={0}>Unpaid</option>
+                        <option value={1}>Paid</option>
+                    </select>
+                    {errors.registration_fee_paid?.message && ( // Fixed this error display
+                        <p className="text-xs text-red-400">
+                            {errors.registration_fee_paid?.message.toString()}
+                        </p>
+                    )}
+                </div>
+            </div>
             <button type="submit" className="bg-blue-400 text-white p-2 rounded-md">
                 {type === 'create' ? 'Create' : 'Update'}
             </button>

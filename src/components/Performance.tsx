@@ -1,7 +1,7 @@
 'use client'
 import moment from 'moment'
 import Image from 'next/image'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from 'recharts'
 
 type Props = {
@@ -10,16 +10,16 @@ type Props = {
     paidPercentage: number
 }
 
-const data = [
-    { name: 'Group A', value: 92, fill: '#C3EBFA' },
-    { name: 'Group B', value: 8, fill: '#FAE27C' },
-]
-
 const Performance = ({ attendancePercentage, contributePercentage, paidPercentage }: Props) => {
-    useEffect(() => {
-        console.log(attendancePercentage, contributePercentage, paidPercentage)
+    const [data, setData] = useState<any[]>()
 
-        // const paidPercentage = 300 > 0 ? Math.round((paidFees / totalFees) * 100) : 0
+    useEffect(() => {
+        const numerator = attendancePercentage + contributePercentage + paidPercentage
+        const percentage = Math.round((numerator / 300) * 100)
+        setData([
+            { name: 'Group A', value: percentage, fill: '#C3EBFA' },
+            { name: 'Group B', value: 100 - percentage, fill: '#FAE27C' },
+        ])
     }, [attendancePercentage, contributePercentage, paidPercentage])
 
     return (
@@ -43,8 +43,8 @@ const Performance = ({ attendancePercentage, contributePercentage, paidPercentag
                 </PieChart>
             </ResponsiveContainer>
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                <h1 className="text-3xl font-bold">9.2</h1>
-                <p className="text-xs text-gray-300">of 10 max LTS</p>
+                <h1 className="text-3xl font-bold">{`${data?.[0].value}%`}</h1>
+                <p className="text-xs text-gray-300">of 100 max AEF</p>
             </div>
             <h2 className="font-medium absolute bottom-16 left-0 right-0 m-auto text-center">
                 {moment().format('dddd, MMMM Do YYYY')}

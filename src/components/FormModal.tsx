@@ -97,7 +97,7 @@ const FormModal = ({ table, type, data, id }: Props) => {
     const Form = () => {
         if (type === 'delete' && id) {
             return (
-                <form action={''} onSubmit={deleteHandler} className="p-4 flex flex-col gap-4">
+                <form action={''} onSubmit={deleteHandler} className="p-4 flex flex-col gap-4 ">
                     <span className="text-center font-medium">
                         All data will be lost. Are you sure you want to delete this item {table}?
                     </span>
